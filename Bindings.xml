@@ -1,0 +1,17 @@
+<Bindings>
+ <Binding name="Open Totem Panel" header="Jelli Totems">
+    jelli_open(keystate)
+ </Binding>
+ <Binding name="Earth Totem">
+    jelli_earth_select(keystate)
+ </Binding>
+  <Binding name="Fire Totem">
+    jelli_fire_select(keystate)
+ </Binding>
+  <Binding name="Water Totem">
+    jelli_water_select(keystate)
+ </Binding>
+  <Binding name="Airs Totem">
+    jelli_air_select(keystate)
+ </Binding>
+</Bindings>
