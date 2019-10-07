@@ -89,3 +89,24 @@ function jelli_fire_select(keystate)
 
     print('[1. Searing][2: Fire Nove]')
 end
+
+function main()
+    print('> initialising..')
+    local totems = {
+        "Strength of Earth Totem",
+        "Earthbind Totem",
+        "Windfury Totem",
+        "Healing Stream Totem"
+    }
+
+    local learned_totems = {}
+
+    for _, t in pairs(totems) do
+        local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(t)
+        if name then
+            print('> '..name)
+        end
+    end
+end
+
+main()
