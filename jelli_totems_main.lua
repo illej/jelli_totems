@@ -1,21 +1,7 @@
-print('hello!')
 
 local panel = {
     state = 'closed'
 }
-
-local btn, evts = CreateFrame("BUTTON", "my_button", UIParent, "SecureActionButtonTemplate")
-btn:RegisterEvent("COMBAT_LOG_EVENT")
-btn:RegisterEvent("SPELLS_CHANGED")
--- btn:RegisterEvent("VARIABLES_LOADED")
-btn:SetScript("OnEvent", function(self, event, ...)
-    -- print('EVENT: '..event)
-    if event == "SPELLS_CHANGED" then
-        load_spells(self)
-    else
-        eventHandler(self, event, CombatLogGetCurrentEventInfo())
-    end
-end)
 
 local timer = nil
 
@@ -23,6 +9,17 @@ local earth_totems_learned = {}
 local fire_totems_learned = {}
 local water_totems_learned = {}
 local air_totems_learned = {}
+
+local btn = CreateFrame("BUTTON", "my_button", UIParent, "SecureActionButtonTemplate")
+btn:RegisterEvent("COMBAT_LOG_EVENT")
+btn:RegisterEvent("SPELLS_CHANGED")
+btn:SetScript("OnEvent", function(self, event, ...)
+    if event == "SPELLS_CHANGED" then
+        load_spells(self)
+    else
+        eventHandler(self, event, CombatLogGetCurrentEventInfo())
+    end
+end)
 
 function load_totems(totems)
     local learned = {}
@@ -38,6 +35,7 @@ function load_totems(totems)
 
     return learned
 end
+
 function load_spells(self)
     local earth_totems = {
         "Stoneskin Totem",
@@ -71,38 +69,32 @@ function load_spells(self)
 end
 
 function eventHandler(self, event, ...)
-    -- print('event: '..event)
     if event == "COMBAT_LOG_EVENT" then
-     local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = 
-     ...; -- Those arguments appear for all combat event variants.
-     local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
+        local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = 
+        ...; -- Those arguments appear for all combat event variants.
+        local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
     --  print('> '..eventPrefix..' - '..eventSuffix..'('..combatEvent..')')
-     if eventSuffix == "DAMAGE" then
+        if eventSuffix == "DAMAGE" then
       -- Something dealt damage. The last 9 arguments in ... describe how much damage was dealt.
       -- To extract those, we can use the select function:
-      local numArgumentsInVarArg = select("#", ...)
-      local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = 
-       select(numArgumentsInVarArg - 8, ...);
+            local numArgumentsInVarArg = select("#", ...)
+            local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = 
+            select(numArgumentsInVarArg - 8, ...);
       -- Do something with the damage details ... 
-      if eventPrefix == "RANGE" or eventPrefix:match("^SPELL") then
+            if eventPrefix == "RANGE" or eventPrefix:match("^SPELL") then
        -- The first three arguments for these prefixes (appearing after the 11 common to all COMBAT_LOG_EVENTs) 
        --  describe the spell or ability dealing damage. Extract these using select:
-       local spellId, spellName, spellSchool = select(12, ...); -- Everything from 12th argument in ... onward
+                local spellId, spellName, spellSchool = select(12, ...); -- Everything from 12th argument in ... onward
        -- Do something with the spell details ...
     --    print('spell cast: '..spellName)
-      end
+            end
+        end
 
-
-      
-     end
-
-     if combatEvent == 'SPELL_SUMMON' then
-        jelli_finish()
-      end
+        if combatEvent == 'SPELL_SUMMON' then
+            jelli_finish()
+        end
     end
 end
-
-
 
 function jelli_open(keystate)
     if panel.state == 'closed' then
@@ -153,27 +145,4 @@ function bind_elements(totems)
         print('['..i..': '..totem..']')
     end
     print(' ')
-end
-function jelli_earth_select(keystate)
-    if keystate == "up" then
-        
-    end 
-end
-
-function jelli_fire_select(keystate)
-    if keystate == "up" then
-        for i, t in pairs(fire_totems_learned) do
-            SetOverrideBindingSpell(btn, true, i, t)
-            print('['..i..': '..t..']')
-        end
-    end 
-end
-
-function jelli_water_select(keystate)
-    if keystate == "up" then
-        for i, t in pairs(water_totems_learned) do
-            SetOverrideBindingSpell(btn, true, i, t)
-            print('['..i..': '..t..']')
-        end
-    end 
 end
