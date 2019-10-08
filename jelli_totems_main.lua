@@ -6,15 +6,75 @@ local panel = {
 
 local btn, evts = CreateFrame("BUTTON", "my_button", UIParent, "SecureActionButtonTemplate")
 btn:RegisterEvent("COMBAT_LOG_EVENT")
+btn:RegisterEvent("SPELLS_CHANGED")
+-- btn:RegisterEvent("VARIABLES_LOADED")
 btn:SetScript("OnEvent", function(self, event, ...)
-    eventHandler(self, event, CombatLogGetCurrentEventInfo())
+    -- print('EVENT: '..event)
+    if event == "SPELLS_CHANGED" then
+        load_spells(self)
+    else
+        eventHandler(self, event, CombatLogGetCurrentEventInfo())
+    end
 end)
+
+local timer = nil
+
+local earth_totems_learned = {}
+local fire_totems_learned = {}
+local water_totems_learned = {}
+local air_totems_learned = {}
+
+function load_totems(totems)
+    local learned = {}
+    local idx = 1
+
+    for _, t in pairs(totems) do
+        local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(t)
+        if name then
+            learned[idx] = name
+            idx = idx + 1
+        end
+    end
+
+    return learned
+end
+function load_spells(self)
+    local earth_totems = {
+        "Stoneskin Totem",
+        "Earthbind Totem",
+        "Stoneclaw Totem",
+        "Strength of Earth Totem",
+        "Tremor Totem",
+    }
+    local fire_totems = {
+        "Searing Totem",
+        "Fire Nova Totem",
+        "Frost Resistance Totem",
+        "Magma Totem",
+        "Flametongue Totem",
+    }
+    local water_totems = {
+        "Healing Stream Totem",
+        "Poison Cleansing Totem",
+        "Mana Spring Totem",
+        "Fire Resistance Totem",
+        "Disease Cleansing Totem"
+    }
+    local air_totems = {
+        -- TODO
+    }
+
+    earth_totems_learned = load_totems(earth_totems)
+    fire_totems_learned = load_totems(fire_totems)
+    water_totems_learned = load_totems(water_totems)
+    air_totems_learned = load_totems(air_totems)
+end
 
 function eventHandler(self, event, ...)
     -- print('event: '..event)
     if event == "COMBAT_LOG_EVENT" then
      local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = 
-      ...; -- Those arguments appear for all combat event variants.
+     ...; -- Those arguments appear for all combat event variants.
      local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
     --  print('> '..eventPrefix..' - '..eventSuffix..'('..combatEvent..')')
      if eventSuffix == "DAMAGE" then
@@ -42,71 +102,78 @@ function eventHandler(self, event, ...)
     end
 end
 
-local timer = nil
+
 
 function jelli_open(keystate)
     if panel.state == 'closed' then
         panel.state = 'open'
 
-        SetOverrideBinding(btn, true, "Q", "Earth Totem")
-        SetOverrideBinding(btn, true, "W", "Fire Totem")
-        SetOverrideBinding(btn, true, "E", "Water Totem")
-        SetOverrideBinding(btn, true, "R", "Air Totem")
+        SetOverrideBinding(btn, true, "1", "Earth Totem")
+        SetOverrideBinding(btn, true, "2", "Fire Totem")
+        SetOverrideBinding(btn, true, "3", "Water Totem")
+        SetOverrideBinding(btn, true, "4", "Air Totem")
 
-        print("[Q: Earth][W: Fire][E. Water][R. Air]")
-        timer = C_Timer.NewTimer(1, jelli_finish)
+        print('[1: Earth]')
+        print('[2: Fire]')
+        print('[3. Water]')
+        print('[4. Air]')
+        print(' ')
+
+        timer = C_Timer.NewTimer(3, jelli_finish)
     elseif panel.state == 'open' then
-        panel.state = 'closed'
-
-        ClearOverrideBindings(btn);
-        if timer then
-            timer:Cancel()
-            timer = nil
-        end
+        jelli_finish()
     end
 end
 
 function jelli_finish()
     panel.state = 'closed'
     ClearOverrideBindings(btn)
-    print(panel.state)
+
     if timer then
         timer:Cancel()
         timer = nil
     end
 end
 
-function jelli_earth_select(keystate)
-    SetOverrideBindingSpell(btn, true, "1", "Strength of Earth Totem")
-    SetOverrideBindingSpell(btn, true, "2", "Earthbind Totem")
-
-    print("[1. Strength][2. Earthbind]")
-end
-
-function jelli_fire_select(keystate)
-    SetOverrideBinding(btn, true, "1", "SPELL Searing Totem")
-    SetOverrideBindingSpell(btn, true, "2", "Fire Nova Totem")
-
-    print('[1. Searing][2: Fire Nove]')
-end
-
-function main()
-    print('> initialising..')
-    local totems = {
-        "Strength of Earth Totem",
-        "Earthbind Totem",
-        "Windfury Totem",
-        "Healing Stream Totem"
-    }
-
-    local learned_totems = {}
-
-    for _, t in pairs(totems) do
-        local name, rank, icon, castTime, minRange, maxRange, spellId = GetSpellInfo(t)
-        if name then
-            print('> '..name)
-        end
+function process_key(keystate, element)
+    local bindings = {}
+    bindings["earth"] = earth_totems_learned
+    bindings["fire"] = fire_totems_learned
+    bindings["water"] = water_totems_learned
+    bindings["air"] = air_totems_learned
+    
+    if keystate == "up" then
+        bind_elements(bindings[element])
     end
 end
 
-main()
+function bind_elements(totems)
+    for i, totem in pairs(totems) do
+        SetOverrideBindingSpell(btn, true, i, totem)
+        print('['..i..': '..totem..']')
+    end
+    print(' ')
+end
+function jelli_earth_select(keystate)
+    if keystate == "up" then
+        
+    end 
+end
+
+function jelli_fire_select(keystate)
+    if keystate == "up" then
+        for i, t in pairs(fire_totems_learned) do
+            SetOverrideBindingSpell(btn, true, i, t)
+            print('['..i..': '..t..']')
+        end
+    end 
+end
+
+function jelli_water_select(keystate)
+    if keystate == "up" then
+        for i, t in pairs(water_totems_learned) do
+            SetOverrideBindingSpell(btn, true, i, t)
+            print('['..i..': '..t..']')
+        end
+    end 
+end

@@ -2,16 +2,20 @@
  <Binding name="Open Totem Panel" header="Jelli Totems">
     jelli_open(keystate)
  </Binding>
- <Binding name="Earth Totem">
-    jelli_earth_select(keystate)
+ <Binding name="Earth Totem" runOnUp="true">
+    <!-- jelli_earth_select(keystate) -->
+   process_key(keystate, "earth")
  </Binding>
-  <Binding name="Fire Totem">
-    jelli_fire_select(keystate)
+  <Binding name="Fire Totem" runOnUp="true">
+    <!-- jelli_fire_select(keystate) -->
+    process_key(keystate, "fire")
  </Binding>
-  <Binding name="Water Totem">
-    jelli_water_select(keystate)
+  <Binding name="Water Totem" runOnUp="true">
+    <!-- jelli_water_select(keystate) -->
+    process_key(keystate, "water")
  </Binding>
-  <Binding name="Airs Totem">
-    jelli_air_select(keystate)
+  <Binding name="Airs Totem" runOnUp="true">
+    <!-- jelli_air_select(keystate) -->
+    process_key(keystate, "air")
  </Binding>
 </Bindings>
