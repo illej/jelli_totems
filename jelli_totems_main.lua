@@ -146,3 +146,35 @@ function bind_elements(totems)
     end
     print(' ')
 end
+
+local panel = CreateFrame("BUTTON", "TotemPanel", UIParent, "SecureHandlerClickTemplate");
+panel:SetAttribute("_onclick", [=[
+    if button == "LeftButton" then    
+        print('> TotemPanel')
+        self:SetBindingClick(true, "1", "earth")
+        self:SetBindingClick(true, "2", "fire")
+    end
+]=]); 
+
+local earth = CreateFrame("BUTTON", "earth", panel, "SecureHandlerClickTemplate")
+earth:SetAttribute("_onclick", [=[
+    if button == "LeftButton" then
+        print('> earth')
+        self:SetBindingSpell(true, "1", "Earthbind Totem")
+        self:SetBindingSpell(true, "2", "Strength of Earth Totem")
+    end
+]=])
+
+local fire = CreateFrame("BUTTON", "fire", panel, "SecureHandlerClickTemplate")
+fire:SetAttribute("_onclick", [=[
+    if button == "LeftButton" then
+        print('> fire')
+        self:SetBindingSpell(true, "1", "Searing Totem")
+        self:SetBindingSpell(true, "2", "Fire Nova Totem")
+    end
+]=])
+fire:WrapScript(fire, "PostClick", [[
+    print('post')
+    local p = self:GetParent()
+    p:ClearBindings()    
+]])
