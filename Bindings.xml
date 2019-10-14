@@ -1,6 +1,6 @@
 <Bindings>
  <Binding name="Open Totem Panel" header="Jelli Totems">
-    jelli_open(keystate)
+    <!-- jelli_open(keystate) -->
  </Binding>
  <Binding name="Earth Totem" runOnUp="true">
     <!-- jelli_earth_select(keystate) -->
